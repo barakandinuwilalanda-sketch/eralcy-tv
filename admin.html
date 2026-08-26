@@ -1,0 +1,1227 @@
+<!DOCTYPE html>
+<html lang="sw">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Eralcy TV Admin CMS</title>
+
+<style>
+
+:root {
+    --bg: #0f1015;
+    --box: #242733;
+    --input: #151720;
+    --border: #3a3e4d;
+    --pink: #ff3366;
+    --blue: #1877f2;
+    --green: #16c784;
+    --red: #dc3545;
+    --text: #ffffff;
+    --muted: #a0a5b8;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: Arial, sans-serif;
+    padding: 20px;
+}
+
+.container {
+    max-width: 850px;
+    margin: auto;
+}
+
+.box {
+    background: var(--box);
+    padding: 25px;
+    border-radius: 14px;
+    margin-bottom: 20px;
+    border: 1px solid var(--border);
+}
+
+h1 {
+    color: var(--pink);
+    margin-top: 0;
+}
+
+h2 {
+    margin-top: 0;
+}
+
+label {
+    display: block;
+    margin-top: 15px;
+    margin-bottom: 6px;
+    color: #ddd;
+    font-weight: 600;
+}
+
+input,
+textarea,
+select {
+    width: 100%;
+    padding: 13px;
+    background: var(--input);
+    color: white;
+    border: 1px solid var(--border);
+    border-radius: 7px;
+    outline: none;
+}
+
+input:focus,
+textarea:focus,
+select:focus {
+    border-color: var(--pink);
+}
+
+textarea {
+    height: 140px;
+    resize: vertical;
+}
+
+button {
+    width: 100%;
+    padding: 14px;
+    margin-top: 18px;
+    border: 0;
+    color: white;
+    border-radius: 7px;
+    cursor: pointer;
+    font-weight: bold;
+    font-size: 15px;
+}
+
+.publish {
+    background: var(--pink);
+}
+
+.sync {
+    background: var(--blue);
+}
+
+.delete {
+    background: var(--red);
+}
+
+.edit {
+    background: #6f42c1;
+}
+
+.cancel {
+    background: #555;
+}
+
+.status {
+    margin-top: 15px;
+    color: var(--muted);
+    line-height: 1.8;
+}
+
+.post {
+    padding: 16px;
+    background: var(--input);
+    margin-top: 12px;
+    border-radius: 9px;
+    border: 1px solid var(--border);
+}
+
+.post-title {
+    font-size: 17px;
+    font-weight: bold;
+    margin-bottom: 8px;
+}
+
+.post-meta {
+    color: var(--muted);
+    font-size: 13px;
+    line-height: 1.7;
+}
+
+.post-actions {
+    display: flex;
+    gap: 10px;
+}
+
+.post-actions button {
+    flex: 1;
+}
+
+.preview {
+    margin-top: 15px;
+    display: none;
+}
+
+.preview img,
+.preview video {
+    max-width: 100%;
+    max-height: 300px;
+    border-radius: 8px;
+}
+
+.progress {
+    display: none;
+    width: 100%;
+    background: #111;
+    border-radius: 10px;
+    margin-top: 15px;
+    overflow: hidden;
+}
+
+.progress-bar {
+    width: 0%;
+    height: 8px;
+    background: var(--pink);
+}
+
+.search {
+    margin-bottom: 15px;
+}
+
+.logout {
+    background: #444;
+}
+
+.home {
+    background: var(--green);
+}
+
+@media(max-width:600px) {
+
+    body {
+        padding: 10px;
+    }
+
+    .box {
+        padding: 18px;
+    }
+
+    .post-actions {
+        flex-direction: column;
+    }
+
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="container">
+
+<div class="box">
+
+<h1>🎬 Eralcy TV Admin CMS</h1>
+
+<p>
+Hapa ndipo unapoweka habari, picha na video.
+Ukibonyeza <b>PUBLISH</b>, itaonekana kwenye website.
+</p>
+
+<div id="status" class="status">
+Inaangalia server...
+</div>
+
+<button
+    class="home"
+    onclick="window.location.href='index01.html'"
+>
+    🏠 Fungua Website
+</button>
+
+<button
+    class="sync"
+    onclick="syncSocial()"
+>
+    🔄 IMPORT SOCIAL MEDIA
+</button>
+
+</div>
+
+
+<div class="box">
+
+<h2 id="formTitle">
+📝 Tuma Habari Mpya
+</h2>
+
+<form id="postForm">
+
+<input
+    type="hidden"
+    id="postId"
+>
+
+
+<label>
+Kichwa cha Habari
+</label>
+
+<input
+    id="title"
+    placeholder="Mfano: Diamond Platnumz atoa taarifa mpya..."
+    required
+>
+
+
+<label>
+Category
+</label>
+
+<select id="category">
+
+<option value="Entertainment">
+Entertainment
+</option>
+
+<option value="Bongo Flava">
+Bongo Flava
+</option>
+
+<option value="Events">
+Events
+</option>
+
+<option value="Trending">
+Trending
+</option>
+
+<option value="Videos">
+Videos
+</option>
+
+</select>
+
+
+<label>
+Picha ya Habari
+</label>
+
+<input
+    type="file"
+    id="imageFile"
+    accept="image/*"
+>
+
+
+<label>
+Au Image URL
+</label>
+
+<input
+    id="image"
+    placeholder="https://..."
+>
+
+
+<label>
+Video
+</label>
+
+<input
+    type="file"
+    id="videoFile"
+    accept="video/mp4,video/webm,video/ogg"
+>
+
+
+<label>
+Au Video URL
+</label>
+
+<input
+    id="video"
+    placeholder="https://..."
+>
+
+
+<div
+    id="preview"
+    class="preview"
+></div>
+
+
+<label>
+Maelezo ya Habari
+</label>
+
+<textarea
+    id="content"
+    placeholder="Andika habari yako hapa..."
+></textarea>
+
+
+<label>
+Source
+</label>
+
+<select id="source">
+
+<option value="Website">
+Website
+</option>
+
+<option value="TikTok">
+TikTok
+</option>
+
+<option value="Instagram">
+Instagram
+</option>
+
+<option value="Facebook">
+Facebook
+</option>
+
+<option value="YouTube">
+YouTube
+</option>
+
+</select>
+
+
+<label>
+Social Media URL
+</label>
+
+<input
+    id="sourceUrl"
+    placeholder="https://..."
+>
+
+
+<label>
+Habari ionekane kwa muda gani?
+</label>
+
+<select id="expiryHours">
+
+<option value="1">
+Saa 1
+</option>
+
+<option value="6">
+Saa 6
+</option>
+
+<option value="24" selected>
+Saa 24
+</option>
+
+<option value="72">
+Siku 3
+</option>
+
+<option value="168">
+Siku 7
+</option>
+
+<option value="never">
+Forever
+</option>
+
+</select>
+
+
+<button
+    class="publish"
+    type="submit"
+    id="submitButton"
+>
+🚀 PUBLISH HABARI
+</button>
+
+
+<button
+    type="button"
+    class="cancel"
+    id="cancelButton"
+    onclick="cancelEdit()"
+    style="display:none"
+>
+❌ CANCEL EDIT
+</button>
+
+</form>
+
+
+<div
+    class="progress"
+    id="progress"
+>
+    <div
+        class="progress-bar"
+        id="progressBar"
+    ></div>
+</div>
+
+</div>
+
+
+<div class="box">
+
+<h2>
+📰 Posts Zilizopo
+</h2>
+
+<input
+    class="search"
+    id="postSearch"
+    placeholder="🔎 Tafuta post..."
+    oninput="filterPosts()"
+>
+
+<div id="posts">
+Loading...
+</div>
+
+</div>
+
+</div>
+
+
+<script>
+
+let allPosts = [];
+
+
+/* ===============================
+   LOAD POSTS
+================================ */
+
+async function loadPosts() {
+
+    try {
+
+        const response =
+            await fetch("/api/posts");
+
+        if (!response.ok) {
+            throw new Error("Server error");
+        }
+
+        allPosts =
+            await response.json();
+
+        renderPosts(allPosts);
+
+        setStatus(
+            "🟢 Server iko online"
+        );
+
+    } catch (error) {
+
+        console.error(error);
+
+        document.getElementById("posts").innerHTML =
+            `<p style="color:#ff3366">
+                Server haijapatikana.
+                Hakikisha backend imewashwa.
+            </p>`;
+
+        setStatus(
+            "🔴 Backend haijaunganishwa"
+        );
+    }
+
+}
+
+
+/* ===============================
+   DISPLAY POSTS
+================================ */
+
+function renderPosts(posts) {
+
+    const container =
+        document.getElementById("posts");
+
+    container.innerHTML = "";
+
+    if (!posts.length) {
+
+        container.innerHTML =
+            `<p style="color:#a0a5b8">
+                Hakuna posts bado.
+            </p>`;
+
+        return;
+    }
+
+
+    posts.forEach(post => {
+
+        const div =
+            document.createElement("div");
+
+        div.className = "post";
+
+
+        div.innerHTML = `
+
+            <div class="post-title">
+                ${escapeHTML(post.title)}
+            </div>
+
+            <div class="post-meta">
+
+                Category:
+                <b>${escapeHTML(post.category)}</b>
+
+                <br>
+
+                Source:
+                ${escapeHTML(post.source || "Website")}
+
+                <br>
+
+                ${post.created_at
+                    ? formatDate(post.created_at)
+                    : ""
+                }
+
+            </div>
+
+            <div class="post-actions">
+
+                <button
+                    class="edit"
+                    onclick="editPost(${post.id})"
+                >
+                    ✏️ Edit
+                </button>
+
+                <button
+                    class="delete"
+                    onclick="deletePost(${post.id})"
+                >
+                    🗑️ Futa
+                </button>
+
+            </div>
+        `;
+
+        container.appendChild(div);
+
+    });
+
+}
+
+
+/* ===============================
+   SEARCH POSTS
+================================ */
+
+function filterPosts() {
+
+    const query =
+        document
+        .getElementById("postSearch")
+        .value
+        .toLowerCase()
+        .trim();
+
+
+    const results =
+        allPosts.filter(post =>
+
+            String(post.title || "")
+                .toLowerCase()
+                .includes(query)
+
+            ||
+
+            String(post.content || "")
+                .toLowerCase()
+                .includes(query)
+
+            ||
+
+            String(post.category || "")
+                .toLowerCase()
+                .includes(query)
+
+        );
+
+
+    renderPosts(results);
+
+}
+
+
+/* ===============================
+   CREATE / UPDATE
+================================ */
+
+document
+.getElementById("postForm")
+.addEventListener(
+    "submit",
+    async function(event) {
+
+        event.preventDefault();
+
+
+        const id =
+            document
+            .getElementById("postId")
+            .value;
+
+
+        const formData =
+            new FormData();
+
+
+        formData.append(
+            "title",
+            document.getElementById("title").value
+        );
+
+        formData.append(
+            "category",
+            document.getElementById("category").value
+        );
+
+        formData.append(
+            "content",
+            document.getElementById("content").value
+        );
+
+        formData.append(
+            "image",
+            document.getElementById("image").value
+        );
+
+        formData.append(
+            "video",
+            document.getElementById("video").value
+        );
+
+        formData.append(
+            "source",
+            document.getElementById("source").value
+        );
+
+        formData.append(
+            "sourceUrl",
+            document.getElementById("sourceUrl").value
+        );
+
+        formData.append(
+            "expiryHours",
+            document.getElementById("expiryHours").value
+        );
+
+
+        const imageFile =
+            document.getElementById("imageFile").files[0];
+
+        const videoFile =
+            document.getElementById("videoFile").files[0];
+
+
+        if (imageFile) {
+
+            formData.append(
+                "imageFile",
+                imageFile
+            );
+
+        }
+
+
+        if (videoFile) {
+
+            formData.append(
+                "videoFile",
+                videoFile
+            );
+
+        }
+
+
+        const url =
+            id
+            ? `/api/posts/${id}`
+            : "/api/posts";
+
+
+        const method =
+            id
+            ? "PUT"
+            : "POST";
+
+
+        try {
+
+            showProgress(true);
+
+
+            const response =
+                await fetch(
+                    url,
+                    {
+                        method,
+                        body: formData
+                    }
+                );
+
+
+            const result =
+                await response.json();
+
+
+            if (!response.ok) {
+
+                throw new Error(
+                    result.message ||
+                    "Imeshindikana"
+                );
+
+            }
+
+
+            alert(
+                id
+                ? "Post imebadilishwa!"
+                : "Post imechapishwa!"
+            );
+
+
+            cancelEdit();
+
+            loadPosts();
+
+
+        } catch(error) {
+
+            alert(
+                "ERROR: " +
+                error.message
+            );
+
+        } finally {
+
+            showProgress(false);
+
+        }
+
+    }
+);
+
+
+/* ===============================
+   EDIT
+================================ */
+
+function editPost(id) {
+
+    const post =
+        allPosts.find(
+            p => Number(p.id) === Number(id)
+        );
+
+
+    if (!post) return;
+
+
+    document.getElementById("postId").value =
+        post.id;
+
+    document.getElementById("title").value =
+        post.title || "";
+
+    document.getElementById("category").value =
+        post.category || "Entertainment";
+
+    document.getElementById("image").value =
+        post.image || "";
+
+    document.getElementById("video").value =
+        post.video || "";
+
+    document.getElementById("content").value =
+        post.content || "";
+
+    document.getElementById("source").value =
+        post.source || "Website";
+
+    document.getElementById("sourceUrl").value =
+        post.source_url || "";
+
+    document.getElementById("expiryHours").value =
+        post.expiry_hours || "24";
+
+
+    document.getElementById("formTitle").innerText =
+        "✏️ Edit Habari";
+
+
+    document.getElementById("submitButton").innerText =
+        "💾 HIFADHI MABADILIKO";
+
+
+    document.getElementById("cancelButton").style.display =
+        "block";
+
+
+    window.scrollTo({
+        top: 0,
+        behavior: "smooth"
+    });
+
+}
+
+
+/* ===============================
+   CANCEL EDIT
+================================ */
+
+function cancelEdit() {
+
+    document
+    .getElementById("postForm")
+    .reset();
+
+
+    document.getElementById("postId").value =
+        "";
+
+
+    document.getElementById("formTitle").innerText =
+        "📝 Tuma Habari Mpya";
+
+
+    document.getElementById("submitButton").innerText =
+        "🚀 PUBLISH HABARI";
+
+
+    document.getElementById("cancelButton").style.display =
+        "none";
+
+
+    document.getElementById("preview").style.display =
+        "none";
+
+}
+
+
+/* ===============================
+   DELETE
+================================ */
+
+async function deletePost(id) {
+
+    if (
+        !confirm(
+            "Una uhakika unataka kufuta post hii?"
+        )
+    ) {
+        return;
+    }
+
+
+    try {
+
+        const response =
+            await fetch(
+                `/api/posts/${id}`,
+                {
+                    method: "DELETE"
+                }
+            );
+
+
+        if (!response.ok) {
+
+            throw new Error(
+                "Delete imeshindikana"
+            );
+
+        }
+
+
+        loadPosts();
+
+
+    } catch(error) {
+
+        alert(error.message);
+
+    }
+
+}
+
+
+/* ===============================
+   SOCIAL SYNC
+================================ */
+
+async function syncSocial() {
+
+    setStatus(
+        "🔄 Inasoma social media..."
+    );
+
+
+    try {
+
+        const response =
+            await fetch(
+                "/api/sync",
+                {
+                    method: "POST"
+                }
+            );
+
+
+        const result =
+            await response.json();
+
+
+        setStatus(
+            result.message ||
+            "Social media ime-sync."
+        );
+
+
+        loadPosts();
+
+
+    } catch(error) {
+
+        setStatus(
+            "🔴 Social sync imeshindikana."
+        );
+
+    }
+
+}
+
+
+/* ===============================
+   SOCIAL STATUS
+================================ */
+
+async function status() {
+
+    try {
+
+        const response =
+            await fetch(
+                "/api/social-status"
+            );
+
+
+        const data =
+            await response.json();
+
+
+        document.getElementById("status").innerHTML =
+
+            "TikTok: " +
+            (
+                data.tiktok
+                ? "🟢 Connected"
+                : "🔴 Haijaunganishwa"
+            )
+
+            +
+
+            " | Facebook: " +
+
+            (
+                data.facebook
+                ? "🟢 Connected"
+                : "🔴 Haijaunganishwa"
+            )
+
+            +
+
+            " | Instagram: " +
+
+            (
+                data.instagram
+                ? "🟢 Connected"
+                : "🔴 Haijaunganishwa"
+            )
+
+            +
+
+            " | YouTube: " +
+
+            (
+                data.youtube
+                ? "🟢 Connected"
+                : "🔴 Haijaunganishwa"
+            );
+
+
+    } catch(error) {
+
+        setStatus(
+            "🔴 Backend haipatikani."
+        );
+
+    }
+
+}
+
+
+/* ===============================
+   PREVIEW
+================================ */
+
+document
+.getElementById("imageFile")
+.addEventListener(
+    "change",
+    function() {
+
+        const file = this.files[0];
+
+        if (!file) return;
+
+
+        const url =
+            URL.createObjectURL(file);
+
+
+        const preview =
+            document.getElementById("preview");
+
+
+        preview.style.display =
+            "block";
+
+
+        preview.innerHTML =
+            `<img src="${url}">`;
+
+    }
+);
+
+
+document
+.getElementById("videoFile")
+.addEventListener(
+    "change",
+    function() {
+
+        const file = this.files[0];
+
+        if (!file) return;
+
+
+        const url =
+            URL.createObjectURL(file);
+
+
+        const preview =
+            document.getElementById("preview");
+
+
+        preview.style.display =
+            "block";
+
+
+        preview.innerHTML =
+            `<video
+                src="${url}"
+                controls
+            ></video>`;
+
+    }
+);
+
+
+/* ===============================
+   HELPERS
+================================ */
+
+function setStatus(text) {
+
+    document.getElementById("status").innerText =
+        text;
+
+}
+
+
+function showProgress(show) {
+
+    const progress =
+        document.getElementById("progress");
+
+
+    progress.style.display =
+        show
+        ? "block"
+        : "none";
+
+
+    if (show) {
+
+        document.getElementById("progressBar").style.width =
+            "70%";
+
+    } else {
+
+        document.getElementById("progressBar").style.width =
+            "0%";
+
+    }
+
+}
+
+
+function formatDate(date) {
+
+    return new Date(date)
+        .toLocaleString("sw-TZ");
+
+}
+
+
+function escapeHTML(value) {
+
+    return String(value || "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+
+}
+
+
+loadPosts();
+
+status();
+
+
+/*
+ * Refresh posts automatically.
+ * Hii ndiyo inafanya habari mpya
+ * ionekane bila kufungua page upya.
+ */
+
+setInterval(
+    loadPosts,
+    15000
+);
+
+</script>
+<script src=""></script>
+</body>
+
+</html>
