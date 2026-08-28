@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="sw">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Eralcy TV</title>
+    <!-- CSS YAKO -->
+    <link rel="stylesheet" href="public.css">
+</head>
+<body>
+
+<header>
+    <div class="nav-container">
+        <a href="index01.html" class="logo">
+            <img src="elilucy.jpeg" alt="Eralcy TV Logo" style="width:150px; height:auto;">
+        </a>
+        <h4>Eralcy TV</h4>
+
+        <div class="menu">
+            <button onclick="filterPosts('all')">Home</button>
+            <button onclick="filterPosts('Entertainment')">Entertainment</button>
+            <button onclick="filterPosts('Bongo Flava')">Bongo Flava</button>
+            <button onclick="filterPosts('Events')">Events</button>
+            <button onclick="filterPosts('Trending')">🔥 Trending</button>
+            <button onclick="filterPosts('Videos')">Videos</button>
+            <a href="admin.html" class="admin-btn">Admin</a>
+        </div>
+
+        <input id="search" type="text" placeholder="Tafuta..." oninput="searchPosts()">
+    </div>
+</header>
+
+<main class="container">
+    <!-- MAIN CONTENT -->
+    <div class="main-content">
+        <div class="section-title">
+            <span>Habari za Hivi Punde & Burudani</span>
+        </div>
+
+        <!-- ID HII INASOMA HABARI ZOTE ZINAZOINGIA -->
+        <div id="newsGrid" class="news-grid">
+            <!-- Habari na video zitaload hapa -->
+        </div>
+    </div>
+
+    <!-- SIDEBAR -->
+    <aside>
+        <div class="sidebar-widget">
+            <h3>Fuatilia Eralcy TV</h3>
+            <div class="social-links" style="margin-top: 15px;">
+                <a href="https://youtube.com/@officialeralcytv?si=as8LRpCO1JZmQS6X" target="_blank" class="social-btn youtube">YouTube</a>
+                <a href="https://www.instagram.com/eralcy_tv?igsi=MXB4bmh5NTQ4NGJkdw==" target="_blank" class="social-btn instagram">Instagram</a>
+                <a href="https://vm.tiktok.com/ZS9BexdgWkgCC-502q4/" target="_blank" class="social-btn tiktok">TikTok</a>
+                <a href="https://www.facebook.com/profile.php?id=61590734378168" target="_blank" class="social-btn facebook">Facebook</a>
+            </div>
+        </div>
+
+        <div class="sidebar-widget">
+            <div class="adsense-box">
+                Google AdSense Banner Space<br>(300x250 Responsive)
+            </div>
+        </div>
+
+        <div class="sidebar-widget" id="about">
+            <h3>Kuhusu Eralcy TV</h3>
+            <p style="font-size: 13px; color: var(--text-secondary); margin-top: 10px;">
+                Eralcy TV ni kitovu chako cha kwanza kwa burudani zote za Bongo Flava, habari za mastaa, matukio ya kipekee na video za moto Tanzania na Afrika Mashariki.
+            </p>
+            <p style="font-size: 13px; color: var(--text-secondary); margin-top: 10px;">
+                <b>Wasiliana Nasi:</b> info@eralcytv.com | +255 773340978
+            </p>
+            <img src="elilucy.jpeg" alt="Eralcy TV Logo" style="width:200px; height:auto;">
+        </div>
+    </aside>
+</main>
+
+<footer>
+    <p>&copy; 2026 Eralcy TV. Haki zote zimehifadhiwa. Designed for Modern Web.</p>
+</footer>
+
+<!-- SCRIPT YA KUCHUKUA POSTS KUTOKA BACKEND -->
+<script>
+let allPosts = [];
+
+async function fetchPosts() {
+    try {
+        const response = await fetch('/api/posts');
+        const posts = await response.json();
+        allPosts = posts;
+        displayPosts(allPosts);
+    } catch (error) {
+        console.error('Kosa la kupata habari:', error);
+    }
+}
+
+function displayPosts(postsToDisplay) {
+    const container = document.getElementById('newsGrid');
+    if (!container) return;
+
+    if (postsToDisplay.length === 0) {
+        container.innerHTML = '<p>Hakuna habari iliyochapishwa bado.</p>';
+        return;
+    }
+
+    container.innerHTML = '';
+
+    postsToDisplay.forEach(post => {
+        const postHTML = `
+            <div class="news-card">
+                <img src="${post.image || 'elilucy.jpeg'}" alt="${post.title}">
+                <div class="news-content">
+                    <span class="badge">${post.category || 'Habari'}</span>
+                    <h3>${post.title}</h3>
+                    <p>${post.content}</p>
+                </div>
+            </div>
+        `;
+        container.innerHTML += postHTML;
+    });
+}
+
+function filterPosts(category) {
+    if (category === 'all' || !category) {
+        displayPosts(allPosts);
+    } else {
+        const filtered = allPosts.filter(p => p.category === category);
+        displayPosts(filtered);
+    }
+}
+
+function searchPosts() {
+    const query = document.getElementById('search').value.toLowerCase();
+    const filtered = allPosts.filter(p => 
+        p.title.toLowerCase().includes(query) || 
+        (p.content && p.content.toLowerCase().includes(query))
+    );
+    displayPosts(filtered);
+}
+
+document.addEventListener('DOMContentLoaded', fetchPosts);
+</script>
+
+<script src="main.js"></script>
+</body>
+</html>

@@ -1,0 +1,17 @@
+{
+  "name": "eralcy-tv",
+  "version": "1.0.0",
+  "description": "Eralcy TV News and Entertainment Platform",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "dependencies": {
+    "axios": "^1.19.0",
+    "better-sqlite3": "^11.10.0",
+    "express": "^5.1.0",
+    "multer": "^2.0.2",
+    "node-cron": "^4.6.0"
+  }
+}
