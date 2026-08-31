@@ -6,8 +6,7 @@ const Database = require("better-sqlite3");
 
 const app = express();
 const PORT = process.env.PORT || 3000;
-// Serve static files (HTML, CSS, JS, Images)
-app.use(express.static(__dirname));
+
 /* =========================
    DATABASE SETUP
 ========================= */
@@ -27,7 +26,6 @@ db.exec(`
         created_at TEXT NOT NULL
     )
 `);
-db.exec("DELETE FROM posts;");
 
 /* =========================
    UPLOAD FOLDERS MANAGEMENT
@@ -59,7 +57,7 @@ const storage = multer.diskStorage({
 
 const upload = multer({
     storage,
-    limits: { fileSize: 500 * 1024 * 1024 } // Limit ya 500MB kwa video
+    limits: { fileSize: 500 * 1024 * 1024 } // Limit ya 500MB
 });
 
 /* =========================
@@ -67,6 +65,7 @@ const upload = multer({
 ========================= */
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(express.static(__dirname));
 app.use(express.static(path.join(__dirname, "public")));
 app.use("/uploads", express.static(uploadDir));
 
@@ -85,7 +84,7 @@ function removeExpiredPosts() {
    API ENDPOINTS
 ========================= */
 
-// 1. GET ALL POSTS (ZINAPANGWA ZA HIVI KARIBUNI KWANZA)
+// 1. GET ALL POSTS
 app.get("/api/posts", (req, res) => {
     removeExpiredPosts();
     const category = req.query.category;
@@ -104,7 +103,56 @@ app.get("/api/posts", (req, res) => {
     res.json(posts);
 });
 
-// 2. CREATE NEW POST
+// 2. SOCIAL STATUS (Kuzuia 404 Error kwenye Admin)
+app.get("/api/social-status", (req, res) => {
+    res.json({ status: "ok", active: true });
+});
+
+// 3. WEBHOOK YA AUTOMATIC POSTS (Iliyoboreshwa kupokea Post Moja au Nyingi)
+app.post("/api/social-webhook", (req, res) => {
+    try {
+        const payload = req.body;
+        
+        // Kama payload ni Array ya post, ichukue moja kwa moja au ichukue post ya kwanza
+        const items = Array.isArray(payload) ? payload : [payload];
+
+        const insertStmt = db.prepare(`
+            INSERT INTO posts (title, category, image, video, content, expiry_hours, expires_at, created_at)
+            VALUES (?, ?, ?, ?, ?, '24', NULL, ?)
+        `);
+
+        let insertedCount = 0;
+
+        for (const item of items) {
+            const content = item.content || item.caption || item.text || item.title || "";
+            if (!content && !item.displayUrl && !item.imageUrl) continue; // Ruka kama haina data yoyote
+
+            const title = item.title || (content.length > 50 ? content.substring(0, 50) + "..." : content) || "Instagram Update";
+            const category = item.category || "Entertainment";
+
+            let image = item.image || item.displayUrl || item.imageUrl || item.url || null;
+            let video = item.video || item.videoUrl || null;
+
+            if (image && (image.includes(".mp4") || image.includes("video"))) {
+                video = image;
+                image = null;
+            }
+
+            const now = new Date().toISOString();
+            insertStmt.run(title, category, image, video, content, now);
+            insertedCount++;
+        }
+
+        console.log(`[Make.com Webhook] Zimeingizwa post ${insertedCount} kwenye Database.`);
+        res.status(200).json({ success: true, message: `${insertedCount} posts stored successfully!` });
+
+    } catch (error) {
+        console.error("Webhook Error:", error);
+        res.status(500).json({ success: false, message: "Webhook error processing data." });
+    }
+});
+
+// 4. CREATE NEW POST (Manual kutoka Admin)
 app.post("/api/posts", upload.fields([{ name: "imageFile", maxCount: 1 }, { name: "videoFile", maxCount: 1 }]), (req, res) => {
     try {
         const body = req.body;
@@ -147,7 +195,7 @@ app.post("/api/posts", upload.fields([{ name: "imageFile", maxCount: 1 }, { name
     }
 });
 
-// 3. UPDATE POST
+// 5. UPDATE POST
 app.put("/api/posts/:id", upload.fields([{ name: "imageFile", maxCount: 1 }, { name: "videoFile", maxCount: 1 }]), (req, res) => {
     try {
         const id = req.params.id;
@@ -179,7 +227,7 @@ app.put("/api/posts/:id", upload.fields([{ name: "imageFile", maxCount: 1 }, { n
     }
 });
 
-// 4. DELETE POST
+// 6. DELETE POST
 app.delete("/api/posts/:id", (req, res) => {
     db.prepare(`DELETE FROM posts WHERE id = ?`).run(req.params.id);
     res.json({ success: true });
@@ -189,5 +237,5 @@ app.delete("/api/posts/:id", (req, res) => {
    WASHA SERVER
 ========================= */
 app.listen(PORT, () => {
-    console.log(`Eralcy TV Server inarun kwenye http://localhost:${PORT}`);
+    console.log(`Eralcy TV Server inarun kwenye http://localhost:${PORT}`);  
 });

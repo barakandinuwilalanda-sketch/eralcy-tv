@@ -3,10 +3,174 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <title>Eralcy TV</title>
-    <!-- CSS YAKO -->
+
+    <!-- SOCIAL MEDIA ICONS -->
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+
+    <!-- CSS YAKO YA ZAMANI -->
     <link rel="stylesheet" href="public.css">
+
+    <!-- STYLES INCLUDING 3D LOGO ROTATION & MEDIA CONTAINER -->
+    <style>
+        /* ==========================================
+           1. CSS YA KUTENGENEZA 3D ROTATION KWA LOGO
+           ========================================== */
+        .logo, #about {
+            perspective: 1000px;
+        }
+
+        .logo img, #about img {
+            transform-style: preserve-3d;
+            animation: rotate3D 6s linear infinite;
+            filter: drop-shadow(0 0 15px rgba(224, 34, 134, 0.4));
+            transition: transform 0.3s ease;
+        }
+
+        .logo img:hover, #about img:hover {
+            animation-play-state: paused;
+        }
+
+        @keyframes rotate3D {
+            0% {
+                transform: rotateY(0deg);
+            }
+            100% {
+                transform: rotateY(360deg);
+            }
+        }
+
+        /* ==========================================
+           2. MEDIA CONTAINER (PICHA NA VIDEO FORMATTING)
+           ========================================== */
+        .news-media-container {
+            width: 100%;
+            height: 250px;
+            background-color: #000;
+            overflow: hidden;
+            border-radius: 8px 8px 0 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .news-media-container img, 
+        .news-media-container video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border: none;
+        }
+
+        /* ==========================================
+           3. SOCIAL MEDIA DESIGN
+           ========================================== */
+        .social-links {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .social-btn {
+            position: relative;
+            width: 58px;
+            height: 58px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 17px;
+            background: #111827;
+            color: #94a3b8;
+            text-decoration: none;
+            border: 1px solid #273449;
+            overflow: hidden;
+            font-size: 23px;
+            transition: width .4s cubic-bezier(.2,.8,.2,1), transform .4s ease, color .4s ease, border-color .4s ease, box-shadow .4s ease;
+        }
+
+        .social-btn::before {
+            content: "";
+            position: absolute;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: var(--social-color);
+            filter: blur(20px);
+            opacity: .6;
+            transition: .5s ease;
+        }
+
+        .social-btn i {
+            position: relative;
+            z-index: 2;
+            transition: .4s ease;
+        }
+
+        .social-btn span {
+            position: absolute;
+            bottom: 6px;
+            font-size: 8px;
+            font-weight: bold;
+            letter-spacing: .5px;
+            color: white;
+            opacity: 0;
+            transform: translateY(10px);
+            transition: .4s ease;
+        }
+
+        .social-btn:hover {
+            width: 105px;
+            color: white;
+            transform: translateY(-10px) rotate(-3deg);
+            border-color: var(--social-color);
+            box-shadow: 0 10px 30px var(--social-shadow);
+        }
+
+        .social-btn:hover::before {
+            width: 100px;
+            height: 100px;
+        }
+
+        .social-btn:hover i {
+            transform: translateY(-8px) scale(1.15);
+        }
+
+        .social-btn:hover span {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .social-btn.youtube {
+            --social-color: #ff0033;
+            --social-shadow: rgba(255, 0, 51, .35);
+        }
+
+        .social-btn.instagram {
+            --social-color: #e1306c;
+            --social-shadow: rgba(225, 48, 108, .35);
+        }
+
+        .social-btn.tiktok {
+            --social-color: #25f4ee;
+            --social-shadow: rgba(37, 244, 238, .35);
+        }
+
+        .social-btn.facebook {
+            --social-color: #1877f2;
+            --social-shadow: rgba(24, 119, 242, .35);
+        }
+
+        @media (max-width: 600px) {
+            .social-links { gap: 9px; }
+            .social-btn { width: 52px; height: 52px; font-size: 20px; }
+            .social-btn:hover { width: 90px; }
+        }
+    </style>
 </head>
+
 <body>
 
 <header>
@@ -14,6 +178,7 @@
         <a href="index01.html" class="logo">
             <img src="elilucy.jpeg" alt="Eralcy TV Logo" style="width:150px; height:auto;">
         </a>
+
         <h4>Eralcy TV</h4>
 
         <div class="menu">
@@ -31,13 +196,13 @@
 </header>
 
 <main class="container">
+
     <!-- MAIN CONTENT -->
     <div class="main-content">
         <div class="section-title">
             <span>Habari za Hivi Punde & Burudani</span>
         </div>
 
-        <!-- ID HII INASOMA HABARI ZOTE ZINAZOINGIA -->
         <div id="newsGrid" class="news-grid">
             <!-- Habari na video zitaload hapa -->
         </div>
@@ -48,10 +213,22 @@
         <div class="sidebar-widget">
             <h3>Fuatilia Eralcy TV</h3>
             <div class="social-links" style="margin-top: 15px;">
-                <a href="https://youtube.com/@officialeralcytv?si=as8LRpCO1JZmQS6X" target="_blank" class="social-btn youtube">YouTube</a>
-                <a href="https://www.instagram.com/eralcy_tv?igsi=MXB4bmh5NTQ4NGJkdw==" target="_blank" class="social-btn instagram">Instagram</a>
-                <a href="https://vm.tiktok.com/ZS9BexdgWkgCC-502q4/" target="_blank" class="social-btn tiktok">TikTok</a>
-                <a href="https://www.facebook.com/profile.php?id=61590734378168" target="_blank" class="social-btn facebook">Facebook</a>
+                <a href="https://youtube.com/@officialeralcytv?si=as8LRpCO1JZmQS6X" target="_blank" class="social-btn youtube">
+                    <i class="fa-brands fa-youtube"></i>
+                    <span>YouTube</span>
+                </a>
+                <a href="https://www.instagram.com/eralcy_tv?igsi=MXB4bmh5NTQ4NGJkdw==" target="_blank" class="social-btn instagram">
+                    <i class="fa-brands fa-instagram"></i>
+                    <span>Instagram</span>
+                </a>
+                <a href="https://vm.tiktok.com/ZS9BexdgWkgCC-502q4/" target="_blank" class="social-btn tiktok">
+                    <i class="fa-brands fa-tiktok"></i>
+                    <span>TikTok</span>
+                </a>
+                <a href="https://www.facebook.com/profile.php?id=61590734378168" target="_blank" class="social-btn facebook">
+                    <i class="fa-brands fa-facebook-f"></i>
+                    <span>Facebook</span>
+                </a>
             </div>
         </div>
 
@@ -69,16 +246,17 @@
             <p style="font-size: 13px; color: var(--text-secondary); margin-top: 10px;">
                 <b>Wasiliana Nasi:</b> info@eralcytv.com | +255 773340978
             </p>
-            <img src="elilucy.jpeg" alt="Eralcy TV Logo" style="width:200px; height:auto;">
+            <img src="elilucy.jpeg" alt="Eralcy TV Logo" style="width:200px; height:auto; margin-top: 15px;">
         </div>
     </aside>
+
 </main>
 
 <footer>
     <p>&copy; 2026 Eralcy TV. Haki zote zimehifadhiwa. Designed for Modern Web.</p>
 </footer>
 
-<!-- SCRIPT YA KUCHUKUA POSTS KUTOKA BACKEND -->
+<!-- BACKEND SCRIPT -->
 <script>
 let allPosts = [];
 
@@ -105,16 +283,43 @@ function displayPosts(postsToDisplay) {
     container.innerHTML = '';
 
     postsToDisplay.forEach(post => {
+        // Kusoma data iwe imeletwa kwa herufi ndogo au kubwa
+        const videoUrl = post.video || post.Video || '';
+        const imageUrl = post.image || post.Image || 'elilucy.jpeg';
+        const title = post.title || post.Title || 'Eralcy TV Post';
+        const content = post.content || post.Content || '';
+        const category = post.category || post.Category || 'Habari';
+
+        // Kutengeneza Media Element (Video au Image)
+        let mediaHTML = '';
+        if (videoUrl && videoUrl.trim() !== '' && videoUrl !== 'null') {
+            mediaHTML = `
+                <div class="news-media-container">
+                    <video controls preload="metadata" poster="${imageUrl !== 'elilucy.jpeg' ? imageUrl : ''}">
+                        <source src="${videoUrl}" type="video/mp4">
+                        Browser yako haisuport ku-play hii video.
+                    </video>
+                </div>
+            `;
+        } else {
+            mediaHTML = `
+                <div class="news-media-container">
+                    <img src="${imageUrl}" alt="${title}" referrerpolicy="no-referrer" onerror="this.src='elilucy.jpeg'">
+                </div>
+            `;
+        }
+
         const postHTML = `
             <div class="news-card">
-                <img src="${post.image || 'elilucy.jpeg'}" alt="${post.title}">
+                ${mediaHTML}
                 <div class="news-content">
-                    <span class="badge">${post.category || 'Habari'}</span>
-                    <h3>${post.title}</h3>
-                    <p>${post.content}</p>
+                    <span class="badge">${category}</span>
+                    <h3>${title}</h3>
+                    <p>${content}</p>
                 </div>
             </div>
         `;
+
         container.innerHTML += postHTML;
     });
 }
@@ -123,17 +328,21 @@ function filterPosts(category) {
     if (category === 'all' || !category) {
         displayPosts(allPosts);
     } else {
-        const filtered = allPosts.filter(p => p.category === category);
+        const filtered = allPosts.filter(p => {
+            const cat = p.category || p.Category;
+            return cat === category;
+        });
         displayPosts(filtered);
     }
 }
 
 function searchPosts() {
     const query = document.getElementById('search').value.toLowerCase();
-    const filtered = allPosts.filter(p => 
-        p.title.toLowerCase().includes(query) || 
-        (p.content && p.content.toLowerCase().includes(query))
-    );
+    const filtered = allPosts.filter(p => {
+        const title = (p.title || p.Title || '').toLowerCase();
+        const content = (p.content || p.Content || '').toLowerCase();
+        return title.includes(query) || content.includes(query);
+    });
     displayPosts(filtered);
 }
 
@@ -141,5 +350,6 @@ document.addEventListener('DOMContentLoaded', fetchPosts);
 </script>
 
 <script src="main.js"></script>
+
 </body>
 </html>
