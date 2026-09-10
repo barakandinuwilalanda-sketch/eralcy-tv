@@ -9,7 +9,7 @@
     <!-- SOCIAL MEDIA ICONS -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 
-    <!-- CSS YAKO YA ZAMANI -->
+    <!-- CSS YAKO -->
     <link rel="stylesheet" href="public.css">
 
     <!-- STYLES INCLUDING 3D LOGO ROTATION & MEDIA CONTAINER -->
@@ -169,7 +169,7 @@
 <header>
     <div class="nav-container">
         <a href="index01.html" class="logo">
-            <img src="/elilucy.jpeg" alt="Eralcy TV Logo" onerror="this.onerror=null; this.src='https://i.ibb.co/L519p48/elilucy.jpg';">
+            <img src="./elilucy.jpeg" alt="Eralcy TV Logo" onerror="this.onerror=null; this.src='https://i.postimg.co/m2S4Zg0s/elilucy.jpg';">
         </a>
 
         <h4>Eralcy TV</h4>
@@ -239,7 +239,7 @@
             <p style="font-size: 13px; color: var(--text-secondary); margin-top: 10px;">
                 <b>Wasiliana Nasi:</b> info@eralcytv.com | +255 773340978
             </p>
-            <img src="/elilucy.jpeg" alt="Eralcy TV Logo" style="width:200px; height:auto; margin-top: 15px;">
+            <img src="./elilucy.jpeg" alt="Eralcy TV Logo" style="width:200px; height:auto; margin-top: 15px;" onerror="this.onerror=null; this.src='https://i.postimg.co/m2S4Zg0s/elilucy.jpg';">
         </div>
     </aside>
 
@@ -277,7 +277,7 @@ function displayPosts(postsToDisplay) {
 
     postsToDisplay.forEach(post => {
         const videoUrl = post.video || post.Video || '';
-        const imageUrl = post.image || post.Image || '/elilucy.jpeg';
+        const imageUrl = post.image || post.Image || './elilucy.jpeg';
         const title = post.title || post.Title || 'Eralcy TV Post';
         const content = post.content || post.Content || '';
         const category = post.category || post.Category || 'Habari';
@@ -286,7 +286,7 @@ function displayPosts(postsToDisplay) {
         if (videoUrl && videoUrl.trim() !== '' && videoUrl !== 'null') {
             mediaHTML = `
                 <div class="news-media-container">
-                    <video controls preload="metadata" poster="${imageUrl !== '/elilucy.jpeg' ? imageUrl : ''}">
+                    <video controls preload="metadata" poster="${imageUrl !== './elilucy.jpeg' ? imageUrl : ''}">
                         <source src="${videoUrl}" type="video/mp4">
                         Browser yako haisuport ku-play hii video.
                     </video>
@@ -295,7 +295,7 @@ function displayPosts(postsToDisplay) {
         } else {
             mediaHTML = `
                 <div class="news-media-container">
-                    <img src="${imageUrl}" alt="${title}" referrerpolicy="no-referrer" onerror="this.src='/elilucy.jpeg'">
+                    <img src="${imageUrl}" alt="${title}" referrerpolicy="no-referrer" onerror="this.src='./elilucy.jpeg'">
                 </div>
             `;
         }
