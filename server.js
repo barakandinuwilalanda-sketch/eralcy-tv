@@ -8,9 +8,15 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 
 /* =========================
+   PERSISTENT STORAGE (Render Disk)
+========================= */
+const DATA_DIR = process.env.DATA_DIR || __dirname;
+fs.mkdirSync(DATA_DIR, { recursive: true });
+
+/* =========================
    DATABASE SETUP
 ========================= */
-const db = new Database("eralcy.db");
+const db = new Database(path.join(DATA_DIR, "eralcy.db"));
 
 // Database Schema
 db.exec(`
@@ -27,10 +33,19 @@ db.exec(`
     )
 `);
 
+// Migration: ongeza columns za source/source_url kama hazipo bado
+const existingColumns = db.prepare(`PRAGMA table_info(posts)`).all().map(c => c.name);
+if (!existingColumns.includes("source")) {
+    db.exec(`ALTER TABLE posts ADD COLUMN source TEXT DEFAULT 'Website'`);
+}
+if (!existingColumns.includes("source_url")) {
+    db.exec(`ALTER TABLE posts ADD COLUMN source_url TEXT`);
+}
+
 /* =========================
    UPLOAD FOLDERS MANAGEMENT
 ========================= */
-const uploadDir = path.join(__dirname, "uploads");
+const uploadDir = path.join(DATA_DIR, "uploads");
 const imageDir = path.join(uploadDir, "images");
 const videoDir = path.join(uploadDir, "videos");
 
@@ -65,6 +80,15 @@ const upload = multer({
 ========================= */
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+/* =========================
+   HOME PAGE (REKEBISHO HAPA)
+   Sasa inatuma index01.html badala ya tv.html
+========================= */
+app.get("/", (req, res) => {
+    res.sendFile(path.join(__dirname, "index01.html"));
+});
+
 app.use(express.static(__dirname));
 app.use(express.static(path.join(__dirname, "public")));
 app.use("/uploads", express.static(uploadDir));
@@ -103,32 +127,32 @@ app.get("/api/posts", (req, res) => {
     res.json(posts);
 });
 
-// 2. SOCIAL STATUS (Kuzuia 404 Error kwenye Admin)
+// 2. SOCIAL STATUS
 app.get("/api/social-status", (req, res) => {
     res.json({ status: "ok", active: true });
 });
 
-// 3. WEBHOOK YA AUTOMATIC POSTS (Iliyoboreshwa kupokea Post Moja au Nyingi)
+// 3. WEBHOOK YA AUTOMATIC POSTS
 app.post("/api/social-webhook", (req, res) => {
     try {
         const payload = req.body;
-        
-        // Kama payload ni Array ya post, ichukue moja kwa moja au ichukue post ya kwanza
         const items = Array.isArray(payload) ? payload : [payload];
 
         const insertStmt = db.prepare(`
-            INSERT INTO posts (title, category, image, video, content, expiry_hours, expires_at, created_at)
-            VALUES (?, ?, ?, ?, ?, '24', NULL, ?)
+            INSERT INTO posts (title, category, image, video, content, expiry_hours, expires_at, source, source_url, created_at)
+            VALUES (?, ?, ?, ?, ?, '24', NULL, ?, ?, ?)
         `);
 
         let insertedCount = 0;
 
         for (const item of items) {
             const content = item.content || item.caption || item.text || item.title || "";
-            if (!content && !item.displayUrl && !item.imageUrl) continue; // Ruka kama haina data yoyote
+            if (!content && !item.displayUrl && !item.imageUrl) continue;
 
             const title = item.title || (content.length > 50 ? content.substring(0, 50) + "..." : content) || "Instagram Update";
             const category = item.category || "Entertainment";
+            const source = item.source || "Instagram";
+            const sourceUrl = item.sourceUrl || item.postUrl || item.url || null;
 
             let image = item.image || item.displayUrl || item.imageUrl || item.url || null;
             let video = item.video || item.videoUrl || null;
@@ -139,7 +163,7 @@ app.post("/api/social-webhook", (req, res) => {
             }
 
             const now = new Date().toISOString();
-            insertStmt.run(title, category, image, video, content, now);
+            insertStmt.run(title, category, image, video, content, source, sourceUrl, now);
             insertedCount++;
         }
 
@@ -152,7 +176,7 @@ app.post("/api/social-webhook", (req, res) => {
     }
 });
 
-// 4. CREATE NEW POST (Manual kutoka Admin)
+// 4. CREATE NEW POST
 app.post("/api/posts", upload.fields([{ name: "imageFile", maxCount: 1 }, { name: "videoFile", maxCount: 1 }]), (req, res) => {
     try {
         const body = req.body;
@@ -175,8 +199,8 @@ app.post("/api/posts", upload.fields([{ name: "imageFile", maxCount: 1 }, { name
         }
 
         const result = db.prepare(`
-            INSERT INTO posts (title, category, image, video, content, expiry_hours, expires_at, created_at)
-            VALUES (@title, @category, @image, @video, @content, @expiry_hours, @expires_at, @created_at)
+            INSERT INTO posts (title, category, image, video, content, expiry_hours, expires_at, source, source_url, created_at)
+            VALUES (@title, @category, @image, @video, @content, @expiry_hours, @expires_at, @source, @source_url, @created_at)
         `).run({
             title: body.title,
             category: body.category,
@@ -185,6 +209,8 @@ app.post("/api/posts", upload.fields([{ name: "imageFile", maxCount: 1 }, { name
             content: body.content || "",
             expiry_hours: body.expiryHours || "24",
             expires_at: expiresAt,
+            source: body.source || "Website",
+            source_url: body.sourceUrl || null,
             created_at: now
         });
 
@@ -208,9 +234,21 @@ app.put("/api/posts/:id", upload.fields([{ name: "imageFile", maxCount: 1 }, { n
         if (req.files && req.files.imageFile) image = "/uploads/images/" + req.files.imageFile[0].filename;
         if (req.files && req.files.videoFile) video = "/uploads/videos/" + req.files.videoFile[0].filename;
 
+        let expiryHours = req.body.expiryHours || old.expiry_hours || "24";
+        let expiresAt = old.expires_at;
+        if (expiryHours !== "never") {
+            const hours = Number(expiryHours);
+            if (!isNaN(hours)) {
+                expiresAt = new Date(Date.now() + hours * 60 * 60 * 1000).toISOString();
+            }
+        } else {
+            expiresAt = null;
+        }
+
         db.prepare(`
             UPDATE posts
-            SET title = ?, category = ?, image = ?, video = ?, content = ?
+            SET title = ?, category = ?, image = ?, video = ?, content = ?,
+                expiry_hours = ?, expires_at = ?, source = ?, source_url = ?
             WHERE id = ?
         `).run(
             req.body.title,
@@ -218,6 +256,10 @@ app.put("/api/posts/:id", upload.fields([{ name: "imageFile", maxCount: 1 }, { n
             image,
             video,
             req.body.content || "",
+            expiryHours,
+            expiresAt,
+            req.body.source || old.source || "Website",
+            req.body.sourceUrl || old.source_url || null,
             id
         );
 
@@ -231,6 +273,18 @@ app.put("/api/posts/:id", upload.fields([{ name: "imageFile", maxCount: 1 }, { n
 app.delete("/api/posts/:id", (req, res) => {
     db.prepare(`DELETE FROM posts WHERE id = ?`).run(req.params.id);
     res.json({ success: true });
+});
+
+// 7. SOCIAL SYNC
+app.post("/api/sync", (req, res) => {
+    try {
+        removeExpiredPosts();
+        const count = db.prepare(`SELECT COUNT(*) AS total FROM posts`).get().total;
+        res.json({ success: true, message: `Sync imekamilika. Posts zilizopo: ${count}.` });
+    } catch (error) {
+        console.error("Sync Error:", error);
+        res.status(500).json({ success: false, message: "Sync imeshindikana." });
+    }
 });
 
 /* =========================

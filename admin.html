@@ -6,6 +6,27 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Eralcy TV Admin CMS</title>
 
+<!-- AUTHENTICATION CHECK (ULINZI WA PASSWORD) -->
+<script>
+(function checkAdminAuth() {
+    const isAuthenticated = sessionStorage.getItem('adminLoggedIn');
+    
+    if (!isAuthenticated) {
+        // Omba Admin Password kabla ya kuonyesha ukurasa
+        const password = prompt("🔐 Ingiza Password ya Admin kuingia Eralcy TV CMS:");
+        
+        // Badilisha 'Eralcy2026' kuwa password unayotaka wewe mwenyewe
+        if (password === "Eralcy2026") {
+            sessionStorage.setItem('adminLoggedIn', 'true');
+            alert("✅ Umeingia kikamilifu kwenye Admin Panel!");
+        } else {
+            alert("❌ Password sio sahihi! Huna ruhusa ya kuingia hapa.");
+            window.location.href = "index01.html"; // Inamtoa na kumrudisha Home Page
+        }
+    }
+})();
+</script>
+
 <style>
 :root {
     --bg: #0f1015;
@@ -96,7 +117,7 @@ button {
     padding: 16px;
     background: var(--input);
     margin-top: 12px;
-    border-radius: 9px;
+    border-radius: 99px;
     border: 1px solid var(--border);
 }
 
@@ -147,6 +168,7 @@ button {
 
 .search { margin-bottom: 15px; }
 .home { background: var(--green); }
+.logout { background: #444; margin-top: 10px; }
 
 @media(max-width:600px) {
     body { padding: 10px; }
@@ -165,8 +187,9 @@ button {
     <p>Hapa ndipo unapoweka habari, picha na video. Ukibonyeza <b>PUBLISH</b>, itaonekana kwenye website.</p>
     <div id="status" class="status">Inaangalia server...</div>
 
-    <button class="home" onclick="window.location.href='/'">🏠 Fungua Website</button>
+    <button class="home" onclick="window.location.href='index01.html'">🏠 Fungua Website</button>
     <button class="sync" onclick="syncSocial()">🔄 IMPORT SOCIAL MEDIA</button>
+    <button class="logout" onclick="logoutAdmin()">🚪 Logout Admin</button>
 </div>
 
 <div class="box">
@@ -245,6 +268,15 @@ button {
 
 <script>
 let allPosts = [];
+
+/* ===============================
+   LOGOUT FUNCTION
+================================ */
+function logoutAdmin() {
+    sessionStorage.removeItem('adminLoggedIn');
+    alert("Umetoka kwenye mifumo ya Admin!");
+    window.location.href = "index01.html";
+}
 
 /* ===============================
    LOAD POSTS
@@ -370,11 +402,33 @@ function editPost(id) {
 
     document.getElementById("postId").value = post.id;
     document.getElementById("title").value = post.title || post.Title || "";
-    document.getElementById("category").value = post.category || post.Category || "Entertainment";
+
+    const categoryValue = post.category || post.Category || "Entertainment";
+    const categorySelect = document.getElementById("category");
+    const hasOption = Array.from(categorySelect.options).some(o => o.value === categoryValue);
+    if (!hasOption) {
+        const opt = document.createElement("option");
+        opt.value = categoryValue;
+        opt.textContent = categoryValue;
+        categorySelect.appendChild(opt);
+    }
+    categorySelect.value = categoryValue;
+
     document.getElementById("image").value = post.image || post.Image || "";
     document.getElementById("video").value = post.video || post.Video || "";
     document.getElementById("content").value = post.content || post.Content || "";
-    document.getElementById("source").value = post.source || "Website";
+
+    const sourceValue = post.source || "Website";
+    const sourceSelect = document.getElementById("source");
+    const hasSourceOption = Array.from(sourceSelect.options).some(o => o.value === sourceValue);
+    if (!hasSourceOption) {
+        const opt = document.createElement("option");
+        opt.value = sourceValue;
+        opt.textContent = sourceValue;
+        sourceSelect.appendChild(opt);
+    }
+    sourceSelect.value = sourceValue;
+
     document.getElementById("sourceUrl").value = post.source_url || "";
     document.getElementById("expiryHours").value = post.expiry_hours || "24";
 

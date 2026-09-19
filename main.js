@@ -25,18 +25,20 @@ async function loadPosts() {
                 });
             }
 
-            // Chukua link halisi ya picha kutoka Instagram
+            // 1. Rekebisho la Picha: Inakubali picha za local (/uploads/...) na za mtandaoni (http...)
             const rawImage = post.image || post.displayUrl || post.media_url || post.imageUrl || post.thumbnailUrl || '';
-            const finalImage = (rawImage && rawImage.startsWith('http')) ? rawImage : 'elilucy.jpeg';
+            const finalImage = (rawImage && rawImage.trim() !== '') ? rawImage : 'elilucy.jpeg';
 
-            // Chukua link halisi ya video kutoka Instagram
+            // 2. Rekebisho la Video: Inakubali video za local (/uploads/...) na za mtandaoni (http...)
             const rawVideo = post.video || post.videoUrl || post.video_url || '';
 
             let mediaHTML = '';
-            if (rawVideo && rawVideo.startsWith('http')) {
+            
+            // Hakikisha haizuii video za local paths (kama /uploads/videos/...)
+            if (rawVideo && rawVideo.trim() !== '') {
                 mediaHTML = `
                     <div class="video-container" style="position:relative; margin-top:10px;">
-                        <video controls width="100%" poster="${finalImage}" onerror="this.poster='elilucy.jpeg';" style="max-height:400px; width:100%; object-fit:cover; border-radius:8px; background:#000;">
+                        <video controls autoplay loop muted playsinline width="100%" poster="${finalImage}" onerror="this.onerror=null; this.poster='elilucy.jpeg';" style="max-height:400px; width:100%; object-fit:cover; border-radius:8px; background:#000;">
                             <source src="${rawVideo}" type="video/mp4">
                             Kivinjari chako hakiauni video hii.
                         </video>
