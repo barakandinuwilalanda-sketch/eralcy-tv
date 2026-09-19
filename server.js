@@ -82,11 +82,22 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 /* =========================
-   HOME PAGE (REKEBISHO HAPA)
-   Sasa inatuma index01.html badala ya tv.html
+   ROUTES ZA KURASA (PAGES)
 ========================= */
+// 1. Home Page
 app.get("/", (req, res) => {
     res.sendFile(path.join(__dirname, "index01.html"));
+});
+
+// 2. Admin CMS Page (REKEBISHO HAPA)
+app.get("/admin", (req, res) => {
+    if (fs.existsSync(path.join(__dirname, "admin.html"))) {
+        res.sendFile(path.join(__dirname, "admin.html"));
+    } else if (fs.existsSync(path.join(__dirname, "public", "admin.html"))) {
+        res.sendFile(path.join(__dirname, "public", "admin.html"));
+    } else {
+        res.status(404).send("Admin file (admin.html) haijapatikana.");
+    }
 });
 
 app.use(express.static(__dirname));
